@@ -15,4 +15,8 @@
     <PackageReference Include="QuestPDF" Version="2026.9.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Resources\Fonts\*.ttf" />
+  </ItemGroup>
+
 </Project>
