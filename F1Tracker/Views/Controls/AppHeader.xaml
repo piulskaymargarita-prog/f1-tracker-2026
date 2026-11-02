@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="F1Tracker.Views.Controls.AppHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:h="clr-namespace:F1Tracker.Helpers"
+             Height="64">
+
+	<UserControl.Resources>
+		<!-- Строка результата поиска -->
+		<Style x:Key="HitItemStyle" TargetType="ListBoxItem">
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+			<EventSetter Event="MouseLeftButtonUp" Handler="Hit_Click"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="ListBoxItem">
+						<Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+							<ContentPresenter/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBrush}"/>
+							</Trigger>
+							<Trigger Property="IsSelected" Value="True">
+								<Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBrush}"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Resources>
+
+	<Border Background="{StaticResource PanelTranslucentBrush}"
+            BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+		<Grid Margin="24,0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+
+			<!-- Логотип (клик → Главная) -->
+			<Grid Grid.Column="0" Background="Transparent" Cursor="Hand" VerticalAlignment="Center"
+                  MouseLeftButtonUp="Logo_Click">
+				<StackPanel Orientation="Horizontal">
+					<Grid>
+						<Border Background="{StaticResource AccentBrush}" CornerRadius="4"
+                                Width="44" Height="30" RenderTransformOrigin="0.5,0.5">
+							<Border.RenderTransform>
+								<SkewTransform AngleX="-14"/>
+							</Border.RenderTransform>
+						</Border>
+						<TextBlock Text="F1" FontFamily="{StaticResource HeadingFont}" FontWeight="Bold"
+                                   FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+					</Grid>
+					<StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+						<TextBlock Text="TRACKER" FontFamily="{StaticResource HeadingFont}"
+                                   FontWeight="Bold" FontSize="14"/>
+						<TextBlock Text="SEASON 2026" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+					</StackPanel>
+				</StackPanel>
+			</Grid>
+
+			<!-- Навигация -->
+			<StackPanel x:Name="NavPanel" Grid.Column="1" Orientation="Horizontal" Margin="28,0,0,0">
+				<Button x:Name="BtnMain" Content="ГЛАВНАЯ" Style="{StaticResource NavButton}"
+                        CommandParameter="{x:Static h:AppPage.Main}" Click="Nav_Click"/>
+				<Button x:Name="BtnData" Content="ДАННЫЕ" Style="{StaticResource NavButton}"
+                        CommandParameter="{x:Static h:AppPage.Data}" Click="Nav_Click"/>
+				<Button x:Name="BtnStats" Content="СТАТИСТИКА" Style="{StaticResource NavButton}"
+                        CommandParameter="{x:Static h:AppPage.Statistics}" Click="Nav_Click"/>
+				<Button x:Name="BtnAdmin" Content="АДМИН" Style="{StaticResource NavButton}"
+                        CommandParameter="{x:Static h:AppPage.Admin}" Click="Nav_Click"/>
+				<Button x:Name="BtnAbout" Content="О ПРОГРАММЕ" Style="{StaticResource NavButton}"
+                        CommandParameter="{x:Static h:AppPage.About}" Click="Nav_Click"/>
+			</StackPanel>
+
+			<!-- Сквозной поиск -->
+			<Grid Grid.Column="2" Margin="24,0" MaxWidth="380" VerticalAlignment="Center">
+				<TextBox x:Name="SearchBox" Padding="36,8,10,8" MaxLength="50"
+                         TextChanged="SearchBox_TextChanged" PreviewKeyDown="SearchBox_PreviewKeyDown"/>
+				<TextBlock Text="🔍" Margin="12,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedBrush}" IsHitTestVisible="False"/>
+				<TextBlock Text="Поиск: команды, пилоты, Гран-при…" Margin="36,0,0,0"
+                           VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                           IsHitTestVisible="False">
+					<TextBlock.Style>
+						<Style TargetType="TextBlock">
+							<Setter Property="Visibility" Value="Collapsed"/>
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+									<Setter Property="Visibility" Value="Visible"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</TextBlock.Style>
+				</TextBlock>
+
+				<Popup x:Name="ResultsPopup" PlacementTarget="{Binding ElementName=SearchBox}"
+                       Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+					<Border Width="{Binding ActualWidth, ElementName=SearchBox}" Margin="0,6,0,14"
+                            Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource LineBrush}"
+                            BorderThickness="1" CornerRadius="8" MaxHeight="360">
+						<Border.Effect>
+							<DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.5"/>
+						</Border.Effect>
+						<Grid>
+							<TextBlock x:Name="EmptyText" Text="Ничего не найдено" Margin="14"
+                                       Foreground="{StaticResource MutedBrush}" Visibility="Collapsed"/>
+							<ListBox x:Name="HitsList" Background="Transparent" BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource HitItemStyle}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     PreviewKeyDown="HitsList_PreviewKeyDown">
+								<ListBox.ItemTemplate>
+									<DataTemplate>
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="88"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Text="{Binding Kind}" VerticalAlignment="Center"
+                                                       FontFamily="{StaticResource HeadingFont}" FontWeight="Bold"
+                                                       FontSize="11" Foreground="{StaticResource AccentBrush}"/>
+											<StackPanel Grid.Column="1">
+												<TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+												<TextBlock Text="{Binding Subtitle}" FontSize="12"
+                                                           Foreground="{StaticResource MutedBrush}"/>
+											</StackPanel>
+										</Grid>
+									</DataTemplate>
+								</ListBox.ItemTemplate>
+							</ListBox>
+						</Grid>
+					</Border>
+				</Popup>
+			</Grid>
+
+			<!-- Пользователь и выход -->
+			<StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+				<StackPanel Margin="0,0,14,0" VerticalAlignment="Center">
+					<TextBlock x:Name="UserText" FontWeight="Bold" HorizontalAlignment="Right"/>
+					<Border x:Name="RoleBadge" CornerRadius="3" Padding="6,1" Margin="0,2,0,0"
+                            HorizontalAlignment="Right">
+						<TextBlock x:Name="RoleText" FontSize="10" FontWeight="Bold"/>
+					</Border>
+				</StackPanel>
+				<Button Content="ВЫЙТИ" Style="{StaticResource GhostButton}" Padding="14,8" Click="Logout_Click"/>
+			</StackPanel>
+		</Grid>
+	</Border>
+</UserControl>
