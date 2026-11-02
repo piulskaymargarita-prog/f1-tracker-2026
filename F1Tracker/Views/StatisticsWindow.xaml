@@ -18,9 +18,92 @@
         <c:BreadcrumbBar Grid.Row="1" Trail="Главная/Статистика"/>
 
         <Grid Grid.Row="2" Style="{StaticResource PageRoot}">
-            <TextBlock x:Name="StubText" Text="Заглушка — содержимое появится на следующих этапах"
-                       Style="{StaticResource MutedText}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Margin="32,8,32,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Сводные карточки -->
+                <UniformGrid Columns="3" Margin="0,0,0,14">
+                    <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="ЛИДЕР ЧЕМПИОНАТА" Style="{StaticResource CaptionText}"/>
+                            <TextBlock x:Name="LeaderDriverText" Style="{StaticResource Heading2}" Margin="0,6,0,0"/>
+                            <TextBlock x:Name="LeaderDriverSub" Style="{StaticResource MutedText}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="ЛИДЕР КУБКА КОНСТРУКТОРОВ" Style="{StaticResource CaptionText}"/>
+                            <TextBlock x:Name="LeaderTeamText" Style="{StaticResource Heading2}" Margin="0,6,0,0"/>
+                            <TextBlock x:Name="LeaderTeamSub" Style="{StaticResource MutedText}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="ГРАН-ПРИ С РЕЗУЛЬТАТАМИ" Style="{StaticResource CaptionText}"/>
+                            <TextBlock x:Name="GpDoneText" Style="{StaticResource BigNumber}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Отчёты и бэкап -->
+                <Border Grid.Row="1" Style="{StaticResource Card}" Padding="14" Margin="0,0,0,14">
+                    <WrapPanel VerticalAlignment="Center">
+                        <Button Content="EXCEL: ТАБЛИЦА ПИЛОТОВ" Style="{StaticResource PrimaryButton}"
+                                Margin="0,0,24,0" Click="ExportExcel_Click"/>
+                        <TextBlock Text="ГРАН-ПРИ" Style="{StaticResource CaptionText}"
+                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="GpCombo" Width="260" Margin="0,0,10,0"
+                                  DisplayMemberPath="title" SelectedValuePath="gp_id"/>
+                        <Button Content="PDF: РЕЗУЛЬТАТЫ" Style="{StaticResource PrimaryButton}"
+                                Margin="0,0,24,0" Click="ExportPdf_Click"/>
+                        <Button Content="РЕЗЕРВНАЯ КОПИЯ БД" Style="{StaticResource GhostButton}"
+                                Click="Backup_Click"/>
+                    </WrapPanel>
+                </Border>
+
+                <!-- Таблицы -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource Card}" Margin="0,0,12,0" Padding="0,18,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Margin="18,0,18,10">
+                                <TextBlock Text="ТУРНИРНАЯ ТАБЛИЦА ПИЛОТОВ" Style="{StaticResource CaptionText}"
+                                           VerticalAlignment="Center"/>
+                                <TextBox x:Name="FilterBox" Width="220" HorizontalAlignment="Right"
+                                         MaxLength="40" ToolTip="Фильтр по пилоту, команде или стране"
+                                         TextChanged="FilterBox_TextChanged"/>
+                            </Grid>
+                            <DataGrid x:Name="DriversGrid" Grid.Row="1" AutoGenerateColumns="True"
+                                      AutoGeneratingColumn="Grid_AutoGeneratingColumn"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource Card}" Padding="0,18,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="КУБОК КОНСТРУКТОРОВ" Style="{StaticResource CaptionText}"
+                                       Margin="18,0,18,10" VerticalAlignment="Center" Height="30"/>
+                            <DataGrid x:Name="TeamsGrid" Grid.Row="1" AutoGenerateColumns="True"
+                                      AutoGeneratingColumn="Grid_AutoGeneratingColumn"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
         </Grid>
 
         <c:AppFooter Grid.Row="3"/>
