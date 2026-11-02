@@ -6,6 +6,13 @@
         Height="720" Width="1200" MinHeight="650" MinWidth="1000"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource AppWindow}">
+
+    <Window.Resources>
+        <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+            <Setter Property="Margin" Value="0,12,0,4"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,12 +22,148 @@
         </Grid.RowDefinitions>
 
         <c:AppHeader ActivePage="Data"/>
-        <c:BreadcrumbBar Grid.Row="1" Trail="Главная/Данные"/>
+        <c:BreadcrumbBar x:Name="Crumbs" Grid.Row="1" Trail="Главная/Данные"/>
 
         <Grid Grid.Row="2" Style="{StaticResource PageRoot}">
-            <TextBlock x:Name="StubText" Text="Заглушка — содержимое появится на следующих этапах"
-                       Style="{StaticResource MutedText}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Margin="32,8,32,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Панель: вкладки + фильтр + счётчик -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel x:Name="TabsPanel" Orientation="Horizontal">
+                        <Button Content="КОМАНДЫ" CommandParameter="teams" Height="40"
+                                Style="{StaticResource NavButton}" Click="Tab_Click"/>
+                        <Button Content="ПИЛОТЫ" CommandParameter="drivers" Height="40"
+                                Style="{StaticResource NavButton}" Click="Tab_Click"/>
+                        <Button Content="ГРАН-ПРИ" CommandParameter="grand_prix" Height="40"
+                                Style="{StaticResource NavButton}" Click="Tab_Click"/>
+                        <Button Content="РЕЗУЛЬТАТЫ" CommandParameter="results" Height="40"
+                                Style="{StaticResource NavButton}" Click="Tab_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,20,0">
+                        <TextBlock Text="ФИЛЬТР" Style="{StaticResource CaptionText}"
+                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="FilterBox" Width="300" MaxLength="50"
+                                 TextChanged="FilterBox_TextChanged"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="CountText" Grid.Column="2" Style="{StaticResource MonoText}"
+                               VerticalAlignment="Center" FontSize="12"/>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="340"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Таблица -->
+                    <Border Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+                        <DataGrid x:Name="RecordsGrid" AutoGenerateColumns="True"
+                                  AutoGeneratingColumn="RecordsGrid_AutoGeneratingColumn"
+                                  SelectionChanged="RecordsGrid_SelectionChanged"/>
+                    </Border>
+
+                    <!-- Форма -->
+                    <Border Grid.Column="1" Style="{StaticResource Card}" Margin="16,0,0,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock x:Name="FormTitle" Style="{StaticResource CaptionText}"/>
+                                <TextBlock x:Name="ReadOnlyNote" Style="{StaticResource MutedText}"
+                                           TextWrapping="Wrap" Margin="0,8,0,0" Visibility="Collapsed"
+                                           Text="Справочники редактирует только администратор. Вам доступен просмотр."/>
+
+                                <StackPanel x:Name="FormBody">
+
+                                    <!-- Команды -->
+                                    <StackPanel x:Name="TeamForm">
+                                        <TextBlock Text="Название команды" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="TeamNameBox" MaxLength="50"/>
+                                        <TextBlock Text="Руководитель" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="PrincipalBox" MaxLength="50"/>
+                                        <TextBlock Text="Силовая установка" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="PowerUnitBox" MaxLength="30"/>
+                                        <TextBlock Text="Страна базы" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="BaseCountryBox" MaxLength="40"/>
+                                    </StackPanel>
+
+                                    <!-- Пилоты -->
+                                    <StackPanel x:Name="DriverForm" Visibility="Collapsed">
+                                        <TextBlock Text="Имя пилота" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="DriverNameBox" MaxLength="50"/>
+                                        <TextBlock Text="Номер (1–99)" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="DriverNumberBox" MaxLength="2"/>
+                                        <TextBlock Text="Страна" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="DriverCountryBox" MaxLength="40"/>
+                                        <TextBlock Text="Команда" Style="{StaticResource FieldLabel}"/>
+                                        <ComboBox x:Name="DriverTeamCombo" DisplayMemberPath="team_name"
+                                                  SelectedValuePath="team_id"/>
+                                    </StackPanel>
+
+                                    <!-- Гран-при -->
+                                    <StackPanel x:Name="GpForm" Visibility="Collapsed">
+                                        <TextBlock Text="Название Гран-при" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="GpNameBox" MaxLength="50"/>
+                                        <TextBlock Text="Трасса" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="CircuitBox" MaxLength="60"/>
+                                        <TextBlock Text="Страна" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="GpCountryBox" MaxLength="40"/>
+                                        <TextBlock Text="Номер этапа (1–30)" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="RoundBox" MaxLength="2"/>
+                                        <TextBlock Text="Дата (ГГГГ-ММ-ДД)" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="RaceDateBox" MaxLength="10"/>
+                                        <CheckBox x:Name="SprintCheck" Content="Спринт-уикенд" Margin="0,14,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Результаты -->
+                                    <StackPanel x:Name="ResultForm" Visibility="Collapsed">
+                                        <TextBlock Text="Гран-при" Style="{StaticResource FieldLabel}"/>
+                                        <ComboBox x:Name="ResGpCombo" DisplayMemberPath="title"
+                                                  SelectedValuePath="gp_id"/>
+                                        <TextBlock Text="Сессия" Style="{StaticResource FieldLabel}"/>
+                                        <ComboBox x:Name="ResSessionCombo" SelectedValuePath="Content">
+                                            <ComboBoxItem Content="Race"/>
+                                            <ComboBoxItem Content="Sprint"/>
+                                            <ComboBoxItem Content="Qualifying"/>
+                                        </ComboBox>
+                                        <TextBlock Text="Пилот" Style="{StaticResource FieldLabel}"/>
+                                        <ComboBox x:Name="ResDriverCombo" DisplayMemberPath="driver_name"
+                                                  SelectedValuePath="driver_id"/>
+                                        <TextBlock Text="Позиция (1–22)" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="ResPositionBox" MaxLength="2"/>
+                                        <TextBlock Text="Статус" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox x:Name="ResStatusBox" MaxLength="30" Text="Finished"/>
+                                        <TextBlock Text="Очки (считаются автоматически)" Style="{StaticResource FieldLabel}"/>
+                                        <TextBlock x:Name="ResPointsText" Style="{StaticResource BigNumber}" Text="—"/>
+                                    </StackPanel>
+
+                                    <TextBlock x:Name="ErrorText" Foreground="{StaticResource AccentBrush}"
+                                               TextWrapping="Wrap" MinHeight="36" Margin="0,12,0,0"/>
+                                    <TextBlock x:Name="InfoText" Style="{StaticResource MutedText}"
+                                               TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+                                    <Button Content="СОХРАНИТЬ" Style="{StaticResource PrimaryButton}" Click="Save_Click"/>
+                                    <Button Content="НОВАЯ ЗАПИСЬ" Style="{StaticResource GhostButton}"
+                                            Margin="0,8,0,0" Click="New_Click"/>
+                                    <Button Content="УДАЛИТЬ" Style="{StaticResource DangerButton}"
+                                            Margin="0,8,0,0" Click="Delete_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
         </Grid>
 
         <c:AppFooter Grid.Row="3"/>
