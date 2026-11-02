@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="F1Tracker.Views.Controls.AppFooter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="36">
+	<Border Background="{StaticResource PanelTranslucentBrush}"
+            BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+		<Grid Margin="24,0">
+			<TextBlock Text="© 2026 F1 Tracker · учебный проект · WPF + SQLite" FontSize="12"
+                       Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+				<TextBlock x:Name="DbText" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,20,0"/>
+				<TextBlock x:Name="ClockText" Style="{StaticResource MonoText}" FontSize="12"/>
+			</StackPanel>
+		</Grid>
+	</Border>
+</UserControl>
