@@ -6,6 +6,13 @@
         Height="720" Width="1200" MinHeight="650" MinWidth="1000"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource AppWindow}">
+
+    <Window.Resources>
+        <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+            <Setter Property="Margin" Value="0,12,0,4"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,9 +25,121 @@
         <c:BreadcrumbBar Grid.Row="1" Trail="Главная/О программе"/>
 
         <Grid Grid.Row="2" Style="{StaticResource PageRoot}">
-            <TextBlock x:Name="StubText" Text="Заглушка — содержимое появится на следующих этапах"
-                       Style="{StaticResource MutedText}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Margin="32,8,32,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ===== Левая колонка: автор и описание ===== -->
+                <Border Style="{StaticResource Card}" Padding="28">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="F1 TRACKER 2026" Style="{StaticResource Heading1}"/>
+                            <TextBlock x:Name="VersionText" Style="{StaticResource MutedText}" Margin="0,4,0,0"/>
+
+                            <TextBlock Text="О ПРОЕКТЕ" Style="{StaticResource CaptionText}" Margin="0,26,0,8"/>
+                            <TextBlock x:Name="DescText" TextWrapping="Wrap" LineHeight="22"/>
+
+                            <TextBlock Text="АВТОР" Style="{StaticResource CaptionText}" Margin="0,26,0,8"/>
+                            <TextBlock x:Name="AuthorText" Style="{StaticResource Heading2}"/>
+                            <TextBlock x:Name="GroupText" Margin="0,6,0,0"/>
+                            <TextBlock x:Name="InstitutionText" Style="{StaticResource MutedText}" Margin="0,2,0,0"/>
+
+                            <TextBlock Text="ТЕХНОЛОГИИ" Style="{StaticResource CaptionText}" Margin="0,26,0,8"/>
+                            <ItemsControl x:Name="StackList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,8,8" Padding="12,6" CornerRadius="14"
+                                                Background="{StaticResource InputBgBrush}"
+                                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                                            <TextBlock Text="{Binding}" FontSize="12"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button Content="РЕПОЗИТОРИЙ НА GITHUB" Style="{StaticResource GhostButton}"
+                                    HorizontalAlignment="Left" Margin="0,18,0,0" Click="OpenRepo_Click"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- ===== Правая колонка: статистика + отзыв ===== -->
+                <ScrollViewer Grid.Column="1" Margin="16,0,0,0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="СОСТОЯНИЕ БАЗЫ ДАННЫХ" Style="{StaticResource CaptionText}"
+                                           Margin="0,0,0,12"/>
+                                <ItemsControl x:Name="StatsList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,6">
+                                                <TextBlock Text="{Binding [name]}" Style="{StaticResource MutedText}"/>
+                                                <TextBlock Text="{Binding [cnt]}" Style="{StaticResource MonoText}"
+                                                           HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0"
+                                        Margin="0,8,0,0" Padding="0,10,0,0">
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock Text="Всего записей" FontWeight="Bold"/>
+                                            <TextBlock x:Name="TotalText" Style="{StaticResource MonoText}"
+                                                       FontWeight="Bold" HorizontalAlignment="Right"
+                                                       Foreground="{StaticResource AccentBrush}"/>
+                                        </Grid>
+                                        <Grid Margin="0,6,0,0">
+                                            <TextBlock Text="Размер файла f1.db" Style="{StaticResource MutedText}"/>
+                                            <TextBlock x:Name="SizeText" Style="{StaticResource MonoText}"
+                                                       HorizontalAlignment="Right"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <TextBlock Text="ОБРАТНАЯ СВЯЗЬ" Style="{StaticResource CaptionText}"/>
+
+                                <TextBlock Text="Оценка проекта" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="RatingCombo" SelectedValuePath="Content">
+                                    <ComboBoxItem Content="5"/>
+                                    <ComboBoxItem Content="4"/>
+                                    <ComboBoxItem Content="3"/>
+                                    <ComboBoxItem Content="2"/>
+                                    <ComboBoxItem Content="1"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Комментарий (минимум 10 символов)" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="CommentBox" MaxLength="300" Height="90" AcceptsReturn="True"
+                                         TextWrapping="Wrap" VerticalContentAlignment="Top"
+                                         TextChanged="CommentBox_TextChanged"/>
+                                <TextBlock x:Name="CounterText" Style="{StaticResource MonoText}" FontSize="11"
+                                           Foreground="{StaticResource MutedBrush}"
+                                           HorizontalAlignment="Right" Margin="0,4,0,0" Text="0 / 300"/>
+
+                                <TextBlock x:Name="ErrorText" Foreground="{StaticResource AccentBrush}"
+                                           TextWrapping="Wrap" MinHeight="22" Margin="0,6,0,0"/>
+                                <TextBlock x:Name="InfoText" Style="{StaticResource MutedText}"
+                                           TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+                                <Button Content="ОТПРАВИТЬ" Style="{StaticResource PrimaryButton}"
+                                        Click="Send_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </Grid>
 
         <c:AppFooter Grid.Row="3"/>
